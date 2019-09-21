@@ -32,7 +32,10 @@ openssh-server \
 binutils \
 tcl \
 libibverbs-dev \
-git
+git \
+libsm6 \
+libxext6 \
+libxrender-dev
 
 RUN echo "${domain}.domain users:x:${did}:${domain}.${alias}" >> /etc/group \
 && echo "${domain}.${alias}:x:${uid}:${did}:${alias},,,:/home/${alias}:/bin/bash" >> /etc/passwd \
