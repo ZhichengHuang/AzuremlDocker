@@ -66,11 +66,11 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Install lib for video
-RUN apt-get update && apt-get install -y software-properties-common
-RUN add-apt-repository -y ppa:jonathonf/ffmpeg-3
-RUN apt update && apt-get install -y libavformat-dev libavcodec-dev libswscale-dev libavutil-dev libswresample-dev
-RUN apt-get install -y ffmpeg
-RUN export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
+# RUN apt-get update && apt-get install -y software-properties-common
+# RUN add-apt-repository -y ppa:jonathonf/ffmpeg-3
+# RUN apt update && apt-get install -y libavformat-dev libavcodec-dev libswscale-dev libavutil-dev libswresample-dev
+# RUN apt-get install -y ffmpeg
+# RUN export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
 
 # Set timezone
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
