@@ -12,7 +12,7 @@
 # Label: com.nvidia.cudnn.version=7.6.3.30
 # Label: com.nvidia.volumes.needed=nvidia_driver
 # Ubuntu 18.04
-FROM nvcr.io/nvidia/pytorch:19.11-py3
+FROM nvcr.io/nvidia/pytorch:19.10-py3
 
 USER root:root
 
