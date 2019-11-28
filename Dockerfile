@@ -1,4 +1,4 @@
-# FROM mcr.microsoft.com/azureml/o16n-base/python-assets@sha256:20ba3085141845301907d7ce6e9ee8388a0e43074f56c262d6de7efebf2ba98f AS inferencing-assets
+FROM mcr.microsoft.com/azureml/o16n-base/python-assets@sha256:20ba3085141845301907d7ce6e9ee8388a0e43074f56c262d6de7efebf2ba98f AS inferencing-assets
 
 # Tag: cuda:10.0-cudnn7-devel-ubuntu18.04
 # Env: CUDA_VERSION=10.0.130
