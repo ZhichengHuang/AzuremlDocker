@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/azureml/o16n-base/python-assets@sha256:20ba3085141845301907d7ce6e9ee8388a0e43074f56c262d6de7efebf2ba98f AS inferencing-assets
+# FROM mcr.microsoft.com/azureml/o16n-base/python-assets@sha256:20ba3085141845301907d7ce6e9ee8388a0e43074f56c262d6de7efebf2ba98f AS inferencing-assets
 
 # Tag: cuda:10.0-cudnn7-devel-ubuntu18.04
 # Env: CUDA_VERSION=10.0.130
@@ -75,15 +75,15 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 # Inference
 # Copy logging utilities, nginx and rsyslog configuration files, IOT server binary, etc.
-COPY --from=inferencing-assets /artifacts /var/
-RUN /var/requirements/install_system_requirements.sh && \
-    cp /var/configuration/rsyslog.conf /etc/rsyslog.conf && \
-    cp /var/configuration/nginx.conf /etc/nginx/sites-available/app && \
-    ln -s /etc/nginx/sites-available/app /etc/nginx/sites-enabled/app && \
-    rm -f /etc/nginx/sites-enabled/default
-ENV SVDIR=/var/runit
-ENV WORKER_TIMEOUT=300
-EXPOSE 5001 8883 8888
+# COPY --from=inferencing-assets /artifacts /var/
+# RUN /var/requirements/install_system_requirements.sh && \
+#     cp /var/configuration/rsyslog.conf /etc/rsyslog.conf && \
+#     cp /var/configuration/nginx.conf /etc/nginx/sites-available/app && \
+#     ln -s /etc/nginx/sites-available/app /etc/nginx/sites-enabled/app && \
+#     rm -f /etc/nginx/sites-enabled/default
+# ENV SVDIR=/var/runit
+# ENV WORKER_TIMEOUT=300
+# EXPOSE 5001 8883 8888
 
 
 
