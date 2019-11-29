@@ -1,4 +1,4 @@
-# FROM mcr.microsoft.com/azureml/o16n-base/python-assets@sha256:20ba3085141845301907d7ce6e9ee8388a0e43074f56c262d6de7efebf2ba98f AS inferencing-assets
+FROM mcr.microsoft.com/azureml/o16n-base/python-assets@sha256:20ba3085141845301907d7ce6e9ee8388a0e43074f56c262d6de7efebf2ba98f AS inferencing-assets
 
 # Tag: cuda:10.0-cudnn7-devel-ubuntu18.04
 # Env: CUDA_VERSION=10.0.130
@@ -12,7 +12,7 @@
 # Label: com.nvidia.cudnn.version=7.6.3.30
 # Label: com.nvidia.volumes.needed=nvidia_driver
 # Ubuntu 18.04
-FROM nvcr.io/nvidia/pytorch:19.10-py3
+FROM nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04
 
 USER root:root
 
@@ -25,23 +25,22 @@ ENV NCCL_DEBUG=INFO
 ENV HOROVOD_GPU_ALLREDUCE=NCCL
 
 # Inference
-# COPY --from=inferencing-assets /artifacts /var/
+COPY --from=inferencing-assets /artifacts /var/
 
 # Install Common Dependencies
 RUN apt-get update && \
-    # apt-get install -y --no-install-recommends \
-    # --allow-change-held-packages \
-    # # SSH and RDMA
-    # libmlx4-1 \
-    # libmlx5-1 \
-    # librdmacm1 \
-    # libibverbs1 \
-    # libmthca1 \
-    # libdapl2 \
-    # dapl2-utils \
-    # openssh-client \
-    # openssh-server \
-    # iproute2 && \
+    apt-get install -y --no-install-recommends \
+    # SSH and RDMA
+    libmlx4-1 \
+    libmlx5-1 \
+    librdmacm1 \
+    libibverbs1 \
+    libmthca1 \
+    libdapl2 \
+    dapl2-utils \
+    openssh-client \
+    openssh-server \
+    iproute2 && \
     # Others
     apt-get install -y --no-install-recommends \
     --allow-change-held-packages \
@@ -50,6 +49,8 @@ RUN apt-get update && \
     libbz2-1.0=1.0.6-8.1ubuntu0.2 \
     systemd \
     git=1:2.17.1-1ubuntu0.4 \
+    libnccl2=2.5.6-1+cuda10.0 \
+    libnccl-dev=2.5.6-1+cuda10.0 \
     wget \
     vim \
     tmux \
@@ -76,25 +77,59 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 # Inference
 # Copy logging utilities, nginx and rsyslog configuration files, IOT server binary, etc.
-# COPY --from=inferencing-assets /artifacts /var/
-# RUN /var/requirements/install_system_requirements.sh && \
-#     cp /var/configuration/rsyslog.conf /etc/rsyslog.conf && \
-#     cp /var/configuration/nginx.conf /etc/nginx/sites-available/app && \
-#     ln -s /etc/nginx/sites-available/app /etc/nginx/sites-enabled/app && \
-#     rm -f /etc/nginx/sites-enabled/default
-# ENV SVDIR=/var/runit
-# ENV WORKER_TIMEOUT=300
-# EXPOSE 5001 8883 8888
+COPY --from=inferencing-assets /artifacts /var/
+RUN /var/requirements/install_system_requirements.sh && \
+    cp /var/configuration/rsyslog.conf /etc/rsyslog.conf && \
+    cp /var/configuration/nginx.conf /etc/nginx/sites-available/app && \
+    ln -s /etc/nginx/sites-available/app /etc/nginx/sites-enabled/app && \
+    rm -f /etc/nginx/sites-enabled/default
+ENV SVDIR=/var/runit
+ENV WORKER_TIMEOUT=300
+EXPOSE 5001 8883 8888
+
+# Conda Environment
+ENV MINICONDA_VERSION latest
+ENV PATH /opt/miniconda/bin:$PATH
+RUN wget -qO /tmp/miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
+    bash /tmp/miniconda.sh -bf -p /opt/miniconda && \
+    conda clean -ay && \
+    rm -rf /opt/miniconda/pkgs && \
+    rm /tmp/miniconda.sh && \
+    find / -type d -name __pycache__ | xargs rm -rf
+# Open-MPI installation
+ENV OPENMPI_VERSION 3.1.2
+RUN mkdir /tmp/openmpi && \
+    cd /tmp/openmpi && \
+    wget https://download.open-mpi.org/release/open-mpi/v3.1/openmpi-${OPENMPI_VERSION}.tar.gz && \
+    tar zxf openmpi-${OPENMPI_VERSION}.tar.gz && \
+    cd openmpi-${OPENMPI_VERSION} && \
+    ./configure --enable-orterun-prefix-by-default && \
+    make -j $(nproc) all && \
+    make install && \
+    ldconfig && \
+    rm -rf /tmp/openmpi
 
 
-
-RUN conda install -y pyyaml scipy scikit-learn matplotlib pandas setuptools Cython h5py graphviz libgcc mkl-include cmake cffi typing cython 
+RUN conda install -y python=3.6 numpy pyyaml scipy ipython mkl scikit-learn matplotlib pandas setuptools Cython h5py graphviz libgcc mkl-include cmake cffi typing cython && \
+     conda install -y -c mingfeima mkldnn && \
+     conda install -c anaconda gxx_linux-64
 RUN conda clean -ya
 RUN pip install boto3 addict tqdm regex pyyaml opencv-python azureml-defaults opencv-contrib-python nltk spacy future tensorboard
 # Set CUDA_ROOT
 RUN export CUDA_HOME="/usr/local/cuda"
 
-
+# Install pytorch
+RUN conda install pytorch torchvision cudatoolkit=10.0 -c pytorch
+#Install Faiss
+RUN conda install faiss-gpu cudatoolkit=10.0 -c pytorch # For CUDA10
 
 # Install horovod
-# RUN HOROVOD_GPU_ALLREDUCE=NCCL pip install --no-cache-dir horovod==0.16.1
+RUN HOROVOD_GPU_ALLREDUCE=NCCL pip install --no-cache-dir horovod==0.16.1
+
+#Install apex
+RUN pip uninstall -y apex || :
+RUN cd /tmp && \
+    SHA=ToUcHMe git clone https://github.com/NVIDIA/apex.git
+RUN cd /tmp/apex/ && \
+    python setup.py install --cuda_ext --cpp_ext && \
+    rm -rf /tmp/apex*
