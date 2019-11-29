@@ -29,19 +29,19 @@ ENV HOROVOD_GPU_ALLREDUCE=NCCL
 
 # Install Common Dependencies
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    --allow-change-held-packages \
-    # SSH and RDMA
-    libmlx4-1 \
-    libmlx5-1 \
-    librdmacm1 \
-    libibverbs1 \
-    libmthca1 \
-    libdapl2 \
-    dapl2-utils \
-    openssh-client \
-    openssh-server \
-    iproute2 && \
+    # apt-get install -y --no-install-recommends \
+    # --allow-change-held-packages \
+    # # SSH and RDMA
+    # libmlx4-1 \
+    # libmlx5-1 \
+    # librdmacm1 \
+    # libibverbs1 \
+    # libmthca1 \
+    # libdapl2 \
+    # dapl2-utils \
+    # openssh-client \
+    # openssh-server \
+    # iproute2 && \
     # Others
     apt-get install -y --no-install-recommends \
     --allow-change-held-packages \
