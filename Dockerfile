@@ -88,9 +88,7 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 
 
-RUN conda install -y python=3.6 numpy pyyaml scipy ipython mkl scikit-learn matplotlib pandas setuptools Cython h5py graphviz libgcc mkl-include cmake cffi typing cython && \
-     conda install -y -c mingfeima mkldnn && \
-     conda install -c anaconda gxx_linux-64
+RUN conda install -y pyyaml scipy scikit-learn matplotlib pandas setuptools Cython h5py graphviz libgcc mkl-include cmake cffi typing cython 
 RUN conda clean -ya
 RUN pip install boto3 addict tqdm regex pyyaml opencv-python azureml-defaults opencv-contrib-python nltk spacy future tensorboard
 # Set CUDA_ROOT
@@ -99,4 +97,4 @@ RUN export CUDA_HOME="/usr/local/cuda"
 
 
 # Install horovod
-RUN HOROVOD_GPU_ALLREDUCE=NCCL pip install --no-cache-dir horovod==0.16.1
+# RUN HOROVOD_GPU_ALLREDUCE=NCCL pip install --no-cache-dir horovod==0.16.1
