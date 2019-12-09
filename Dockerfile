@@ -12,7 +12,7 @@
 # Label: com.nvidia.cudnn.version=7.6.3.30
 # Label: com.nvidia.volumes.needed=nvidia_driver
 # Ubuntu 18.04
-FROM nvcr.io/nvidia/pytorch:19.10-py3
+FROM nvcr.io/nvidia/pytorch:19.11-py3
 
 USER root:root
 
@@ -54,6 +54,7 @@ RUN apt-get update && \
     vim \
     tmux \
     unzip \
+    htop \
     ca-certificates \
     libjpeg-dev \
     cpio \
@@ -69,32 +70,14 @@ RUN apt-get update && \
 # RUN add-apt-repository -y ppa:jonathonf/ffmpeg-3
 # RUN apt update && apt-get install -y libavformat-dev libavcodec-dev libswscale-dev libavutil-dev libswresample-dev
 # RUN apt-get install -y ffmpeg
-# RUN export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
+RUN export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
 
 # Set timezone
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
-# Inference
-# Copy logging utilities, nginx and rsyslog configuration files, IOT server binary, etc.
-# COPY --from=inferencing-assets /artifacts /var/
-# RUN /var/requirements/install_system_requirements.sh && \
-#     cp /var/configuration/rsyslog.conf /etc/rsyslog.conf && \
-#     cp /var/configuration/nginx.conf /etc/nginx/sites-available/app && \
-#     ln -s /etc/nginx/sites-available/app /etc/nginx/sites-enabled/app && \
-#     rm -f /etc/nginx/sites-enabled/default
-# ENV SVDIR=/var/runit
-# ENV WORKER_TIMEOUT=300
-# EXPOSE 5001 8883 8888
 
-
-
-RUN conda install -y pyyaml scipy scikit-learn matplotlib pandas setuptools Cython h5py graphviz libgcc mkl-include cmake cffi typing cython 
+RUN conda install -y pyyaml scipy scikit-learn matplotlib pandas setuptools Cython h5py graphviz libgcc mkl-include cmake cffi typing
 RUN conda clean -ya
-RUN pip install boto3 addict tqdm regex pyyaml opencv-python azureml-defaults opencv-contrib-python nltk spacy future tensorboard
+RUN pip install boto3 addict tqdm regex pyyaml opencv-python azureml-defaults opencv-contrib-python nltk spacy future tensorboard sentencepiece
 # Set CUDA_ROOT
 RUN export CUDA_HOME="/usr/local/cuda"
-
-
-
-# Install horovod
-# RUN HOROVOD_GPU_ALLREDUCE=NCCL pip install --no-cache-dir horovod==0.16.1
