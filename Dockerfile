@@ -12,7 +12,7 @@ FROM mcr.microsoft.com/azureml/o16n-base/python-assets@sha256:20ba30851418453019
 # Label: com.nvidia.cudnn.version=7.6.3.30
 # Label: com.nvidia.volumes.needed=nvidia_driver
 # Ubuntu 18.04
-FROM nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04
+FROM nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04
 
 USER root:root
 
@@ -119,7 +119,7 @@ RUN pip install boto3 addict tqdm regex pyyaml opencv-python azureml-defaults op
 RUN export CUDA_HOME="/usr/local/cuda"
 
 # Install pytorch
-RUN conda install pytorch torchvision cudatoolkit=10.0 -c pytorch
+RUN conda install pytorch torchvision cudatoolkit=10.1 -c pytorch
 #Install Faiss
 RUN conda install faiss-gpu cudatoolkit=10.0 -c pytorch # For CUDA10
 
