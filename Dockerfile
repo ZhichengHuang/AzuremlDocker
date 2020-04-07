@@ -29,6 +29,7 @@ COPY --from=inferencing-assets /artifacts /var/
 
 # Install Common Dependencies
 RUN apt-get update && \
+    apt-get install -y apt-transport-https && \
     apt-get install -y --no-install-recommends \
     # SSH and RDMA
     libmlx4-1 \
