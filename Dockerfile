@@ -49,9 +49,9 @@ RUN apt-get update && \
     bzip2=1.0.6-8.1ubuntu0.2 \
     libbz2-1.0=1.0.6-8.1ubuntu0.2 \
     systemd \
-    git=1:2.17.1-1ubuntu0.4 \
-    libnccl2=2.5.6-1+cuda10.0 \
-    libnccl-dev=2.5.6-1+cuda10.0 \
+    git \
+    libnccl2=2.5.6-1+cuda10.1 \
+    libnccl-dev=2.5.6-1+cuda10.1 \
     wget \
     vim \
     tmux \
