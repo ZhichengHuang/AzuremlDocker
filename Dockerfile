@@ -122,7 +122,7 @@ RUN export CUDA_HOME="/usr/local/cuda"
 # Install pytorch
 RUN conda install pytorch torchvision cudatoolkit=10.1 -c pytorch
 #Install Faiss
-RUN conda install faiss-gpu cudatoolkit=10.0 -c pytorch # For CUDA10
+RUN conda install faiss-gpu -c pytorch # For CUDA10.1
 
 # Install horovod
 RUN HOROVOD_GPU_ALLREDUCE=NCCL pip install --no-cache-dir horovod==0.16.1
