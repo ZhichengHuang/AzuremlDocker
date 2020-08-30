@@ -63,6 +63,7 @@ RUN apt-get update && \
     libsm6 \
     libxext6 \
     libxrender-dev \
+    libgl1-mesa-glx \
     fuse && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/*
