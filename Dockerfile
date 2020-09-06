@@ -117,7 +117,7 @@ RUN conda install -y python=3.6 numpy pyyaml scipy ipython mkl scikit-learn matp
      conda install -y -c mingfeima mkldnn && \
      conda install -c anaconda gxx_linux-64
 RUN conda clean -ya
-RUN pip install boto3 addict tqdm regex pyyaml opencv-python azureml-defaults==1.10.0 opencv-contrib-python nltk spacy future tensorboard wandb filelock tokenizers sentencepiece
+RUN pip install boto3 addict tqdm regex pyyaml opencv-python opencv-contrib-python nltk spacy future tensorboard wandb filelock tokenizers sentencepiece
 # Set CUDA_ROOT
 RUN export CUDA_HOME="/usr/local/cuda"
 
