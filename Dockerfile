@@ -28,6 +28,7 @@ ENV HOROVOD_GPU_ALLREDUCE=NCCL
 COPY --from=inferencing-assets /artifacts /var/
 
 # Install Common Dependencies
+RUN printf "deb http://archive.debian.org/debian/ jessie main\ndeb-src http://archive.debian.org/debian/ jessie main\ndeb http://security.debian.org jessie/updates main\ndeb-src http://security.debian.org jessie/updates main" > /etc/apt/sources.list
 RUN apt-get update && \
     apt-get install -y apt-transport-https && \
     apt-get install -y --no-install-recommends \
