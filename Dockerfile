@@ -28,7 +28,6 @@ ENV HOROVOD_GPU_ALLREDUCE=NCCL
 COPY --from=inferencing-assets /artifacts /var/
 
 # Install Common Dependencies
-RUN printf "deb http://archive.debian.org/debian/ jessie main\ndeb-src http://archive.debian.org/debian/ jessie main\ndeb http://security.debian.org jessie/updates main\ndeb-src http://security.debian.org jessie/updates main" > /etc/apt/sources.list
 RUN apt-get update && \
     apt-get install -y apt-transport-https && \
     apt-get install -y --no-install-recommends \
@@ -51,8 +50,6 @@ RUN apt-get update && \
     libbz2-1.0=1.0.6-8.1ubuntu0.2 \
     systemd \
     git \
-    libnccl2=2.5.6-1+cuda10.1 \
-    libnccl-dev=2.5.6-1+cuda10.1 \
     wget \
     vim \
     tmux \
@@ -113,8 +110,8 @@ RUN mkdir /tmp/openmpi && \
     ldconfig && \
     rm -rf /tmp/openmpi
 
-
-RUN conda install -y python=3.6 numpy pyyaml scipy ipython mkl scikit-learn matplotlib pandas setuptools Cython h5py graphviz libgcc mkl-include cmake cffi typing cython && \
+RUN conda install -c r -y conda python=3.6.2 pip=20.1.1
+RUN conda install -y numpy pyyaml scipy ipython mkl scikit-learn matplotlib pandas setuptools Cython h5py graphviz libgcc mkl-include cmake cffi typing cython && \
      conda install -y -c mingfeima mkldnn && \
      conda install -c anaconda gxx_linux-64
 RUN conda clean -ya
