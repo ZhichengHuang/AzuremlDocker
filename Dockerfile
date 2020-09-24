@@ -50,8 +50,6 @@ RUN apt-get update && \
     libbz2-1.0=1.0.6-8.1ubuntu0.2 \
     systemd \
     git \
-    libnccl2=2.5.6-1+cuda10.1 \
-    libnccl-dev=2.5.6-1+cuda10.1 \
     wget \
     vim \
     tmux \
