@@ -116,11 +116,12 @@ RUN conda install -y numpy pyyaml scipy ipython mkl scikit-learn matplotlib pand
      conda install -c anaconda gxx_linux-64
 RUN conda clean -ya
 RUN pip install boto3 addict tqdm regex pyyaml opencv-python opencv-contrib-python nltk spacy future tensorboard wandb filelock tokenizers sentencepiece 
+RUN CC="cc -mavx2" pip install --force-reinstall pillow-simd
 # Set CUDA_ROOT
 RUN export CUDA_HOME="/usr/local/cuda"
 
 # Install pytorch
-RUN conda install pytorch==1.4.0 torchvision cudatoolkit=10.1 -c pytorch
+RUN conda install pytorch torchvision cudatoolkit=10.1 -c pytorch
 #Install Faiss
 RUN conda install faiss-gpu -c pytorch # For CUDA10.1
 
