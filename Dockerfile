@@ -123,7 +123,7 @@ RUN export CUDA_HOME="/usr/local/cuda"
 RUN conda install pytorch torchvision cudatoolkit=10.1 -c pytorch
 #Install Faiss
 RUN conda install faiss-gpu -c pytorch # For CUDA10.1
-RUN pip uninstall pillow && CC="cc -mavx2" pip install --force-reinstall pillow-simd && \
+RUN pip uninstall -y pillow && CC="cc -mavx2" pip install --force-reinstall pillow-simd && \
     pip install --extra-index-url https://developer.download.nvidia.com/compute/redist nvidia-dali-cuda100
 
 # Install horovod
