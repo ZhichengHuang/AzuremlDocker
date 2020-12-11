@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/azureml/o16n-base/python-assets@sha256:20a8b655a3e5b9b0db8ddf70d03d048a7cf49e569c4f0382198b1ee77631a6ad AS inferencing-assets
+# FROM mcr.microsoft.com/azureml/o16n-base/python-assets@sha256:20a8b655a3e5b9b0db8ddf70d03d048a7cf49e569c4f0382198b1ee77631a6ad AS inferencing-assets
 
 # Tag: cuda:10.0-cudnn7-devel-ubuntu18.04
 # Env: CUDA_VERSION=10.0.130
@@ -12,7 +12,7 @@ FROM mcr.microsoft.com/azureml/o16n-base/python-assets@sha256:20a8b655a3e5b9b0db
 # Label: com.nvidia.cudnn.version=7.6.3.30
 # Label: com.nvidia.volumes.needed=nvidia_driver
 # Ubuntu 18.04
-FROM nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04
+FROM nvidia/cuda:11.0-devel-ubuntu18.04
 
 USER root:root
 
