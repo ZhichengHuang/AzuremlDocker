@@ -25,7 +25,7 @@ ENV NCCL_DEBUG=INFO
 ENV HOROVOD_GPU_ALLREDUCE=NCCL
 
 # Inference
-COPY --from=inferencing-assets /artifacts /var/
+# COPY --from=inferencing-assets /artifacts /var/
 
 # Install Common Dependencies
 RUN apt-get update && \
