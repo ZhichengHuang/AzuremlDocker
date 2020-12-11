@@ -120,7 +120,7 @@ RUN pip install boto3 addict tqdm regex pyyaml opencv-python opencv-contrib-pyth
 RUN export CUDA_HOME="/usr/local/cuda"
 
 # Install pytorch
-RUN conda install pytorch torchvision cudatoolkit=10.1 -c pytorch
+RUN conda install pytorch torchvision torchaudio cudatoolkit=11.0 -c pytorch
 #Install Faiss
 RUN conda install faiss-gpu -c pytorch # For CUDA10.1
 RUN pip uninstall -y pillow && CC="cc -mavx2" pip install --force-reinstall pillow-simd && \
