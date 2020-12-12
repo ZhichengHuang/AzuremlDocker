@@ -78,7 +78,7 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 # Inference
 # Copy logging utilities, nginx and rsyslog configuration files, IOT server binary, etc.
-COPY --from=inferencing-assets /artifacts /var/
+# COPY --from=inferencing-assets /artifacts /var/
 RUN /var/requirements/install_system_requirements.sh && \
     cp /var/configuration/rsyslog.conf /etc/rsyslog.conf && \
     cp /var/configuration/nginx.conf /etc/nginx/sites-available/app && \
