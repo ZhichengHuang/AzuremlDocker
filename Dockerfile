@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/azureml/o16n-base/python-assets@sha256:20a8b655a3e5b9b0db8ddf70d03d048a7cf49e569c4f0382198b1ee77631a6ad AS inferencing-assets
+FROM mcr.microsoft.com/azureml/o16n-base/python-assets:20210623.40134510 AS inferencing-assets
 
 # Tag: cuda:10.0-cudnn7-devel-ubuntu18.04
 # Env: CUDA_VERSION=10.0.130
@@ -12,7 +12,8 @@ FROM mcr.microsoft.com/azureml/o16n-base/python-assets@sha256:20a8b655a3e5b9b0db
 # Label: com.nvidia.cudnn.version=7.6.3.30
 # Label: com.nvidia.volumes.needed=nvidia_driver
 # Ubuntu 18.04
-FROM nvidia/cuda:11.0-devel-ubuntu18.04
+FROM nvidia/cuda:11.1.1-cudnn8-devel-ubuntu18.04
+
 
 USER root:root
 
@@ -24,12 +25,9 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/cuda/extra
 ENV NCCL_DEBUG=INFO
 ENV HOROVOD_GPU_ALLREDUCE=NCCL
 
-# Inference
-COPY --from=inferencing-assets /artifacts /var/
 
 # Install Common Dependencies
 RUN apt-get update && \
-    apt-get install -y apt-transport-https && \
     apt-get install -y --no-install-recommends \
     # SSH and RDMA
     libmlx4-1 \
@@ -41,27 +39,49 @@ RUN apt-get update && \
     dapl2-utils \
     openssh-client \
     openssh-server \
+    redis \
     iproute2 && \
+    # rdma-core dependencies
+    apt-get install -y \
+    udev \
+    libudev-dev \
+    libnl-3-dev \
+    libnl-route-3-dev \
+    gcc \
+    ninja-build \
+    pkg-config \
+    valgrind \
+    cython3 \
+    python3-docutils \
+    pandoc \
+    python3-dev && \
     # Others
-    apt-get install -y --no-install-recommends \
-    --allow-change-held-packages \
+    apt-get install -y \
     build-essential \
-    bzip2=1.0.6-8.1ubuntu0.2 \
-    libbz2-1.0=1.0.6-8.1ubuntu0.2 \
+    bzip2 \
+    libbz2-1.0 \
     systemd \
     git \
     wget \
-    vim \
-    tmux \
-    unzip \
-    ca-certificates \
-    libjpeg-dev \
     cpio \
-    jq \
+    pciutils \
+    libnuma-dev \
+    ibutils \
+    ibverbs-utils \ 
+    rdmacm-utils \
+    infiniband-diags \
+    perftest \
+    librdmacm-dev \
+    libibverbs-dev \
     libsm6 \
     libxext6 \
     libxrender-dev \
-    libgl1-mesa-glx \
+    libssl1.1 \
+    libglib2.0-0 \
+    dh-make \
+    libnettle6 \
+    libx11-dev \
+    nginx \
     fuse && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/*
@@ -76,20 +96,8 @@ RUN apt-get update && \
 # Set timezone
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
-# Inference
-# Copy logging utilities, nginx and rsyslog configuration files, IOT server binary, etc.
-COPY --from=inferencing-assets /artifacts /var/
-RUN /var/requirements/install_system_requirements.sh && \
-    cp /var/configuration/rsyslog.conf /etc/rsyslog.conf && \
-    cp /var/configuration/nginx.conf /etc/nginx/sites-available/app && \
-    ln -s /etc/nginx/sites-available/app /etc/nginx/sites-enabled/app && \
-    rm -f /etc/nginx/sites-enabled/default
-ENV SVDIR=/var/runit
-ENV WORKER_TIMEOUT=300
-EXPOSE 5001 8883 8888
-
 # Conda Environment
-ENV MINICONDA_VERSION latest
+ENV MINICONDA_VERSION py37_4.9.2
 ENV PATH /opt/miniconda/bin:$PATH
 RUN wget -qO /tmp/miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
     bash /tmp/miniconda.sh -bf -p /opt/miniconda && \
@@ -97,32 +105,75 @@ RUN wget -qO /tmp/miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-${
     rm -rf /opt/miniconda/pkgs && \
     rm /tmp/miniconda.sh && \
     find / -type d -name __pycache__ | xargs rm -rf
+
+# Open-MPI-UCX installation
+RUN mkdir /tmp/ucx && \
+    cd /tmp/ucx && \
+        wget -q https://github.com/openucx/ucx/releases/download/v1.9.0/ucx-1.9.0.tar.gz && \
+        tar zxf ucx-1.9.0.tar.gz && \
+	cd ucx-1.9.0 && \
+        ./configure --prefix=/usr/local --enable-optimizations --disable-assertions --disable-params-check --enable-mt && \
+        make -j $(nproc --all) && \
+        make install && \
+        rm -rf /tmp/ucx
+
+
 # Open-MPI installation
-ENV OPENMPI_VERSION 3.1.2
+ENV OPENMPI_VERSION 4.1.0
 RUN mkdir /tmp/openmpi && \
     cd /tmp/openmpi && \
-    wget https://download.open-mpi.org/release/open-mpi/v3.1/openmpi-${OPENMPI_VERSION}.tar.gz && \
+    wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-${OPENMPI_VERSION}.tar.gz && \
     tar zxf openmpi-${OPENMPI_VERSION}.tar.gz && \
     cd openmpi-${OPENMPI_VERSION} && \
-    ./configure --enable-orterun-prefix-by-default && \
+    ./configure --with-ucx=/usr/local/ --enable-mca-no-build=btl-uct --enable-orterun-prefix-by-default && \
     make -j $(nproc) all && \
     make install && \
     ldconfig && \
-    rm -rf /tmp/openmpi
+    rm -rf /tmp/openmpi	
+	
+# Msodbcsql17 installation
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
+    curl https://packages.microsoft.com/config/ubuntu/18.04/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
+    apt-get update && \
+    ACCEPT_EULA=Y apt-get install -y msodbcsql17
+
+#Cmake Installation
+RUN apt-get update && \
+    apt-get install -y cmake
+
+# rdma-core v30.0 for Mlnx_ofed_5_1_2 as user space driver
+RUN mkdir /tmp/rdma-core && \
+    cd /tmp/rdma-core && \
+    git clone --branch v30.0 https://github.com/linux-rdma/rdma-core && \
+    cd /tmp/rdma-core/rdma-core && \
+    debian/rules binary && \
+    dpkg -i ../*.deb && \
+    rm -rf /tmp/rdma-core
+
+#Install v3 version of nccl-rdma-sharp-plugins
+RUN cd /tmp && \
+    mkdir -p /usr/local/nccl-rdma-sharp-plugins && \
+    apt install -y dh-make zlib1g-dev && \
+    git clone -b v2.0.0 https://github.com/Mellanox/nccl-rdma-sharp-plugins.git && \
+    cd nccl-rdma-sharp-plugins && \
+    ./autogen.sh && \
+    ./configure --prefix=/usr/local/nccl-rdma-sharp-plugins --with-cuda=/usr/local/cuda --without-ucx && \
+    make && \
+    make install
     
-RUN conda install -c r -y conda python=3.6.2 pip=20.1.1
-RUN conda install -y numpy pyyaml scipy ipython mkl scikit-learn matplotlib pandas setuptools Cython h5py graphviz libgcc mkl-include cmake cffi typing cython && \
-     conda install -y -c mingfeima mkldnn && \
-     conda install -c anaconda gxx_linux-64
+RUN conda install -c r -y conda python=3.7
+RUN conda install -y numpy pyyaml scipy ipython mkl scikit-learn matplotlib pandas setuptools Cython h5py graphviz libgcc mkl-include cmake cffi typing cython
 RUN conda clean -ya
-RUN pip install boto3 addict tqdm regex pyyaml opencv-python opencv-contrib-python azureml-defaults nltk spacy future tensorboard wandb filelock tokenizers sentencepiece yapf attrs
+RUN pip install boto3 addict tqdm regex pyyaml opencv-python opencv-contrib-python azureml-defaults nltk spacy future tensorboard filelock tokenizers sentencepiece yapf attrs
 # Set CUDA_ROOT
 RUN export CUDA_HOME="/usr/local/cuda"
 
 # Install pytorch
-RUN conda install pytorch torchvision torchaudio cudatoolkit=11.0 -c pytorch
+RUN conda install pytorch torchvision torchaudio cudatoolkit=11.1 -c pytorch -c nvidia
 #Install Faiss
-RUN conda install faiss-gpu -c pytorch # For CUDA10.1
+#RUN conda install faiss-gpu -c pytorch # For CUDA10.1
 RUN pip uninstall -y pillow && CC="cc -mavx2" pip install --force-reinstall pillow-simd && \
     pip install --extra-index-url https://developer.download.nvidia.com/compute/redist nvidia-dali-cuda100
 
