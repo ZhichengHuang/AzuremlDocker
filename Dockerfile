@@ -166,7 +166,7 @@ RUN cd /tmp && \
 RUN conda install -c r -y conda python=3.7
 RUN conda install -y numpy pyyaml scipy ipython mkl scikit-learn matplotlib pandas setuptools Cython h5py graphviz libgcc mkl-include cmake cffi typing cython
 RUN conda clean -ya
-RUN pip install boto3 addict tqdm regex pyyaml opencv-python opencv-contrib-python nltk spacy future tensorboard filelock tokenizers sentencepiece yapf attrs
+RUN pip install boto3 addict tqdm regex pyyaml opencv-python opencv-contrib-python nltk spacy future tensorboard filelock tokenizers sentencepiece yapf attrs azureml-core==1.30.0
 # Set CUDA_ROOT
 RUN export CUDA_HOME="/usr/local/cuda"
 
@@ -174,8 +174,8 @@ RUN export CUDA_HOME="/usr/local/cuda"
 RUN conda install pytorch torchvision torchaudio cudatoolkit=11.1 -c pytorch -c nvidia
 #Install Faiss
 #RUN conda install faiss-gpu -c pytorch # For CUDA10.1
-RUN pip uninstall -y pillow && CC="cc -mavx2" pip install --force-reinstall pillow-simd && \
-    pip install --extra-index-url https://developer.download.nvidia.com/compute/redist nvidia-dali-cuda100
+#RUN pip uninstall -y pillow && CC="cc -mavx2" pip install --force-reinstall pillow-simd && \
+    #pip install --extra-index-url https://developer.download.nvidia.com/compute/redist nvidia-dali-cuda100
 
 # Install horovod
 # RUN HOROVOD_GPU_ALLREDUCE=NCCL pip install --no-cache-dir horovod==0.16.1
