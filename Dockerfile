@@ -166,7 +166,7 @@ RUN cd /tmp && \
 RUN conda install -c r -y conda python=3.7
 RUN conda install -y numpy pyyaml scipy ipython mkl scikit-learn matplotlib pandas setuptools Cython h5py graphviz libgcc mkl-include cmake cffi typing cython
 RUN conda clean -ya
-RUN pip install boto3 addict tqdm regex pyyaml opencv-python opencv-contrib-python azureml-defaults nltk spacy future tensorboard filelock tokenizers sentencepiece yapf attrs
+RUN pip install boto3 addict tqdm regex pyyaml opencv-python opencv-contrib-python nltk spacy future tensorboard filelock tokenizers sentencepiece yapf attrs
 # Set CUDA_ROOT
 RUN export CUDA_HOME="/usr/local/cuda"
 
