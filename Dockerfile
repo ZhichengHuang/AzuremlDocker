@@ -82,6 +82,8 @@ RUN apt-get update && \
     libnettle6 \
     libx11-dev \
     nginx \
+    libgl1-mesa-dev \
+    libglib2.0-dev \
     fuse && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/*
