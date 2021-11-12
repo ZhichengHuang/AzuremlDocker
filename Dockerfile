@@ -78,6 +78,8 @@ RUN apt-get update && \
     libxrender-dev \
     libssl1.1 \
     libglib2.0-0 \
+    libffi \
+    libffi-dev \
     dh-make \
     libnettle6 \
     libx11-dev \
@@ -174,6 +176,7 @@ RUN export CUDA_HOME="/usr/local/cuda"
 
 # Install pytorch
 RUN conda install pytorch==1.9.1 torchvision torchaudio cudatoolkit=11.1 -c pytorch -c nvidia
+RUN cd  /opt/miniconda/lib && ln -s libffi.so.6.0.4 libffi.so.7
 #Install Faiss
 #RUN conda install faiss-gpu -c pytorch # For CUDA10.1
 #RUN pip uninstall -y pillow && CC="cc -mavx2" pip install --force-reinstall pillow-simd && \
