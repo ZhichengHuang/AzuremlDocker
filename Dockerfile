@@ -174,7 +174,7 @@ RUN pip install boto3 addict tqdm regex pyyaml opencv-python opencv-contrib-pyth
 RUN export CUDA_HOME="/usr/local/cuda"
 
 # Install pytorch
-RUN conda install pytorch==1.9.1 torchvision torchaudio cudatoolkit=11.1 -c pytorch -c nvidia
+RUN conda install pytorch==1.9.1 torchvision==0.10.1 torchaudio cudatoolkit=11.1 -c pytorch -c nvidia
 RUN cd  /opt/miniconda/lib && ln -s libffi.so.6.0.4 libffi.so.7
 #Install Faiss
 #RUN conda install faiss-gpu -c pytorch # For CUDA10.1
