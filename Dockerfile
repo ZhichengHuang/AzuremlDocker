@@ -78,7 +78,6 @@ RUN apt-get update && \
     libxrender-dev \
     libssl1.1 \
     libglib2.0-0 \
-    libffi \
     libffi-dev \
     dh-make \
     libnettle6 \
