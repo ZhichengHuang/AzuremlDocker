@@ -6,7 +6,7 @@ on:
 
 env:
   # 设置 docker 镜像名
-  IMAGE_NAME: azureml-docker
+  IMAGE_NAME: onnx-runtime
 
 jobs:
   push:
@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build image
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+        run: docker build . --file dockerfile_onnxtime --tag $IMAGE_NAME
       - name: Log into registry
         run: echo "${{ secrets.ACCESS_TOKEN }}" | docker login -u zhichenghuang --password-stdin
 
