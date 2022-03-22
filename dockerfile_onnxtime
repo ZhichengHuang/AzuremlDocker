@@ -1,4 +1,4 @@
-ROM nvcr.io/nvidia/cuda:11.4.2-cudnn8-devel-ubuntu20.04
+FROM nvcr.io/nvidia/cuda:11.4.2-cudnn8-devel-ubuntu20.04
 ENV	    DEBIAN_FRONTEND=noninteractive
 MAINTAINER Changming Sun "chasun@microsoft.com"
 ADD . /code
