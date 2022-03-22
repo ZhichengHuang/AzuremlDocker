@@ -1,4 +1,4 @@
 FROM nvcr.io/nvidia/cuda:11.4.2-cudnn8-runtime-ubuntu20.04
 ENV	    DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y --no-install-recommends libstdc++6 ca-certificates python3-setuptools python3-wheel python3-pip unattended-upgrades && unattended-upgrade && python3 -m pip install /root/*.whl && rm -rf /root/*.whl
-RUN pip3 install opencv-python opencv-contrib-python opencv-python-headless Pillow-SIMD onnxruntime-gpu
+RUN apt-get update && apt-get install -y --no-install-recommends libstdc++6 ca-certificates python3-setuptools python3-wheel python3-pip unattended-upgrades && unattended-upgrade && python3 -m pip install onnxruntime-gpu 
+RUN pip3 install opencv-python opencv-contrib-python opencv-python-headless Pillow-SIMD
